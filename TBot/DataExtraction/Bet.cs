@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TBot.TajperApi
+namespace TBot.DataExtraction
 {
     public class Bet
     {
         string player1;
         string player2;
-
+        //asd
         string league;
         DateTime date;
 

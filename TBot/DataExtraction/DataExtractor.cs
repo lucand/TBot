@@ -6,7 +6,7 @@ using HtmlAgilityPack;
 using System.Windows.Forms;
 using System.IO;
 
-namespace TBot.TajperApi
+namespace TBot.DataExtraction
 {
     public class DataExtractor
     {
