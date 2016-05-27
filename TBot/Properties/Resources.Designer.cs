@@ -59,5 +59,32 @@ namespace TBot.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wszystkie pliki |*.*.
+        /// </summary>
+        internal static string allFilesExtension {
+            get {
+                return ResourceManager.GetString("allFilesExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Błąd aplikacji.
+        /// </summary>
+        internal static string error {
+            get {
+                return ResourceManager.GetString("error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pliki Html|*.html.
+        /// </summary>
+        internal static string htmlExtension {
+            get {
+                return ResourceManager.GetString("htmlExtension", resourceCulture);
+            }
+        }
     }
 }

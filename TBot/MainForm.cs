@@ -19,10 +19,7 @@ namespace TBot
 
         private void startButton_Click(object sender, EventArgs e)
         {
-            (sender as Button).Text = "Stop";
-
             DataExtractor de = new DataExtractor();
-
         }
     }
 }

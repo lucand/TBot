@@ -3,99 +3,127 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections.Specialized;
-using System.Configuration;
+using TBot.Helpers;
 
 namespace TBot.DataExtraction
 {
     public class Bet
     {
-        static NameValueCollection webTemplate = (NameValueCollection)ConfigurationManager.GetSection("webTemplate");
+        private int step;
 
-        int step;
+        public string player1;
+        public string player2;
+        public string league;
 
-        string player1;
-        string player2;
-        //asd
-        string league;
-        DateTime date;
+        public DateTime date;
 
-        string type;
-        decimal bid;
-        string chances;
-        int predictedProfit;
-        double exchange;
+        public string type;
+        public double bid;
+
+        public string chances;
+        public double predictedProfit;
+        public double exchange;
 
         public Bet(Dictionary<string, string> betRawData)
         {
-            foreach (var item in betRawData)
+            try
             {
-                switch (item.Key)
-                {
-                    case "players":
-                        {
-                            getPlayers(item.Value);
-                        } break;
-                    case "league":
-                        {
-                            this.league = item.Value.Replace(webTemplate[item.Key].ToString(), "").Trim();
-                        } break;
-                    case "type":
-                        {
-                            this.type = item.Value.Replace(webTemplate[item.Key].ToString(), "").Trim();
-                        } break;
+                this.step = betRawData["players"].Length % 3 + 2; //czy na pewno
 
-                    case "date":
-                        {
-                            this.date = Convert.ToDateTime(betRawData["date"]);
-                        } break;
-                    case "bid":
-                        {
-                            this.bid = Convert.ToDecimal(item.Value.Replace(webTemplate[item.Key].ToString(), "")
-                                                                 .Replace("j.", "")
-                                                                 .Replace(".", "")
-                                                                 .Trim());
-                        } break;
-                    case "chancesMin":
-                        {
-                            this.chances = item.Value.Replace(webTemplate[item.Key].ToString(), "").Trim();
-                        } break;
-                    case "predictedProfit":
-                        {
-                            this.predictedProfit = Convert.ToInt32(item.Value.Replace(webTemplate[item.Key].ToString(), "")
-                                                                             .Replace("j.", "")
-                                                                             .Trim());
-                        } break;
-                    case "exchange":
-                        {
-                            this.exchange = Convert.ToDouble(item.Value.Replace(webTemplate[item.Key].ToString(), "")
-                                                                       .Replace(".", ",")
-                                                                       .Trim());
-                        } break;
+                foreach (var item in betRawData)
+                {
+                    switch (item.Key)
+                    {
+                        case "players":
+                            {
+                                getPlayers(item.Value);
+                            } break;
+                        case "league":
+                            {
+                                this.league = decodeText(item.Value.Replace(ConfigHelper.webTemplate[item.Key], "").Trim());
+                            } break;
+                        case "type":
+                            {
+                                this.type = item.Value.Replace(ConfigHelper.webTemplate[item.Key], "").Trim();
+                            } break;
+
+                        case "date":
+                            {
+                                this.date = Convert.ToDateTime(item.Value);
+                            } break;
+                        case "bid":
+                            {
+                                this.bid = Convert.ToDouble(item.Value.Replace(ConfigHelper.webTemplate[item.Key], "")
+                                                                     .Replace("j.", "")
+                                                                     .Replace(".", ",")
+                                                                     .Trim());
+                            } break;
+                        case "chancesMin":
+                            {
+                                this.chances = item.Value.Replace(ConfigHelper.webTemplate[item.Key], "").Trim();
+                            } break;
+                        case "predictedProfit":
+                            {
+                                this.predictedProfit = Convert.ToDouble(item.Value.Replace(ConfigHelper.webTemplate[item.Key], "")
+                                                                                 .Replace("j.", "")
+                                                                                 .Replace(".", ",")
+                                                                                 .Trim());
+                            } break;
+                        case "exchange":
+                            {
+                                this.exchange = Convert.ToDouble(item.Value.Replace(ConfigHelper.webTemplate[item.Key], "")
+                                                                           .Replace(".", ",")
+                                                                           .Trim());
+                            } break;
+                    }
                 }
             }
-        }
-
-        string getOnlyNumbers(string str)
-        {
-            return Regex.Match(str, @"\d+").Value;
-        }
-
-        void getPlayers(string players)
-        {
-            players = players.Trim();
-            string playersDecoded = "";
-            this.step = players.Length % 3 + 2; //czy na pewno
-
-            for (int i = 0; i < players.Length; i++)
+            catch (Exception exc)
             {
-                if ((i + 1) % step == 0) continue;
-
-                playersDecoded += players[i];
+                throw new Exception("Constructor(Bet) -> " + exc.Message);
             }
-            string[] playersDecodedTab = playersDecoded.Split('-');
-            this.player1 = playersDecodedTab[0].Trim();
-            this.player2 = playersDecodedTab[1].Trim();
+        }
+
+        //private string getOnlyNumbers(string str)
+        //{
+        //    return Regex.Match(str, @"\d+").Value;
+        //}
+
+        private void getPlayers(string players)
+        {
+            try
+            {
+                string playersDecoded = decodeText(players);
+                string[] playersDecodedTab = playersDecoded.Split('–');
+
+                this.player1 = playersDecodedTab[0].Trim();
+                this.player2 = playersDecodedTab[1].Trim();
+            }
+            catch (Exception exc)
+            {
+                throw new Exception("getPlayers -> " + exc.Message);
+            }
+        }
+
+        private string decodeText(string text)
+        {
+            try
+            {
+                string textDecoded = "";
+
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if ((i + 1) % this.step == 0) continue;
+
+                    textDecoded += text[i];
+                }
+
+                return textDecoded;
+            }
+            catch (Exception exc)
+            {
+                throw new Exception("decodeText -> " + exc.Message);
+            }
         }
     }
 }
